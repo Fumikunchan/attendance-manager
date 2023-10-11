@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import * as dayjs from "dayjs";
 
 export const formatDate = (date) => {
   return dayjs(date).format("YYYY-MM-DD");
@@ -26,7 +26,6 @@ export const ceilTime = (time, minuteUnit = 5) => {
     roundedMinutes,
   )}`;
 };
-
 export const calculateRestMinutes = (workMinutes) => {
   return workMinutes >= 480 ? 60 : workMinutes >= 360 ? 45 : 0;
 };

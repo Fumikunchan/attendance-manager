@@ -116,8 +116,8 @@ function Cell({
           )}
         </td>
         <td className="myCell">
-          {cellData.midnightWork.nightMinutes +
-            cellData.midnightWork.morningMinutes}{" "}
+          {cellData.midnightWork?.nightMinutes +
+            cellData.midnightWork?.morningMinutes}{" "}
           minutes
         </td>
         <td className="myCell font-medium">

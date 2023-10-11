@@ -19,34 +19,51 @@ const ScheduleEditor = ({ dateForScheduleEditor, toggleScheduleEditor }) => {
     setEditorContents({ ...editorContents, [id]: value });
   };
 
-  // const calculateTheDayWorkMinutes = () => {
-  //   const now = dayjs();
-  //   const dataInDatabase = allAttendanceData[PDM.formatDate(now)];
-  //   const clockIn = dayjs(
-  //     `${dataInDatabase.workDate} ${dataInDatabase.clockInEditedTime}`,
-  //   );
-  //   const clockOut = dayjs(`${PDM.formatDate(now)} ${PDM.ceilTime(now)}`);
-  //   return clockOut.diff(clockIn, "minutes"); //未来の時間 - 過去の時間
-  // };
+  const calculateTheDayWorkMinutes = () => {
+    const now = dayjs();
+    const dataInDatabase = allAttendanceData[PDM.formatDate(now)];
+    const clockIn = dayjs(
+      `${dataInDatabase.workDate} ${dataInDatabase.clockInEditedTime}`,
+    );
+    const clockOut = dayjs(`${PDM.formatDate(now)} ${PDM.ceilTime(now)}`);
+    return clockOut.diff(clockIn, "minutes"); //未来の時間 - 過去の時間
+  };
 
   const updateAttendanceData = () => {
     setPastAllAttendanceData(allAttendanceData);
 
     const newScheduleObject = {};
-    newScheduleObject[PDM.formatDate(dateOfCell)] = {
+    newScheduleObject[PDM.formatDate(dateForScheduleEditor)] = {
       ...allAttendanceData[PDM.formatDate(dateForScheduleEditor)],
       ...editorContents,
-      clockInEditedTime: PDM.floorTime(),
-      clockOutEditedTime: PDM.ceilTime(now),
+      ...(editorContents.clockInTime && {
+        clockInEditedTime: PDM.floorTime(
+          dayjs(
+            `${PDM.formatDate(dateForScheduleEditor)}T${
+              editorContents.clockInTime
+            }:00`,
+          ),
+        ),
+      }),
+      ...(editorContents.clockOutTime && {
+        clockOutEditedTime: PDM.ceilTime(
+          dayjs(
+            `${PDM.formatDate(dateForScheduleEditor)}T${
+              editorContents.clockOutTime
+            }:00`,
+          ),
+        ),
+      }),
+
       editDate: `${PDM.formatDate(dayjs())}T${PDM.formatTime(dayjs())}`,
       valid: true,
-      workMinutes: calculateTheDayWorkMinutes(),
-      restMinutes: PDM.calculateRestMinutes(calculateTheDayWorkMinutes()),
+      // workMinutes: calculateTheDayWorkMinutes(),
+      // restMinutes: PDM.calculateRestMinutes(calculateTheDayWorkMinutes()),
     };
 
     setAllAttendanceData({
       ...allAttendanceData,
-      [PDM.formatDate(dateForScheduleEditor)]: newScheduleObject,
+      ...newScheduleObject,
     });
 
     setDisplayingDate(dayjs(dateForScheduleEditor));
