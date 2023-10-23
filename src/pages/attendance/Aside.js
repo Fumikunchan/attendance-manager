@@ -48,7 +48,7 @@ function Aside() {
       },
       valid: true,
       workDate: PDM.formatDate(now),
-      workStatus: "work",
+      workStatus: "Work day",
     };
 
     setAllAttendanceData({ ...allAttendanceData, ...myScheduleObject });
@@ -72,7 +72,7 @@ function Aside() {
       valid: true,
       workDate: PDM.formatDate(now),
       workMinutes: calculateTodaysWorkMinutes(),
-      workStatus: "work",
+      workStatus: "Work day",
     };
 
     setAllAttendanceData({ ...allAttendanceData, ...myScheduleObject });

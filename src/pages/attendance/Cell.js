@@ -39,36 +39,6 @@ function Cell({
     return clockOut.diff(clockIn, "minutes"); //未来の時間 - 過去の時間
   };
 
-  // 確認用なのでモーダル完成後消す
-  const editScheduleObject = () => {
-    setPastAllAttendanceData(allAttendanceData);
-    const now = dayjs();
-    const myScheduleObject = {};
-
-    myScheduleObject[PDM.formatDate(dateOfCell)] = {
-      ...allAttendanceData[PDM.formatDate(dateOfCell)],
-      clockInTime: PDM.formatTime(now),
-      clockInEditedTime: PDM.floorTime(now),
-      clockOutTime: PDM.formatTime(now),
-      clockOutEditedTime: PDM.ceilTime(now),
-      editDate: `${PDM.formatDate(now)}T${PDM.formatTime(now)}`,
-      restMinutes: PDM.calculateRestMinutes(calculateWorkMinutes()),
-      user: {
-        name: "Fumiaki Kondo",
-        id: "11608",
-      },
-      valid: true,
-      workDate: PDM.formatDate(now),
-      workMinutes: calculateWorkMinutes(),
-      workStatus: "Work day",
-    };
-
-    setAllAttendanceData({ ...allAttendanceData, ...myScheduleObject });
-    setDisplayingDate(now);
-  };
-
-  useEffect(() => {}, []);
-
   return (
     <>
       <tr

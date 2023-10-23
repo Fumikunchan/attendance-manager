@@ -12,7 +12,12 @@ const ScheduleEditor = ({ dateForScheduleEditor, toggleScheduleEditor }) => {
     setPastAllAttendanceData,
   } = useContext(CalendarFn);
 
-  const [editorContents, setEditorContents] = useState({});
+  const [editorContents, setEditorContents] = useState({
+    clockInTime:
+      allAttendanceData[PDM.formatDate(dateForScheduleEditor)].clockInTime,
+    clockOutTime:
+      allAttendanceData[PDM.formatDate(dateForScheduleEditor)].clockOutTime,
+  });
   const handleInputChange = (e) => {
     const value = e.target.value;
     const id = e.target.id;
@@ -21,11 +26,13 @@ const ScheduleEditor = ({ dateForScheduleEditor, toggleScheduleEditor }) => {
 
   const calculateTheDayWorkMinutes = () => {
     const now = dayjs();
-    const dataInDatabase = allAttendanceData[PDM.formatDate(now)];
     const clockIn = dayjs(
-      `${dataInDatabase.workDate} ${dataInDatabase.clockInEditedTime}`,
+      `${PDM.formatDate(now)} ${editorContents.clockInEditedTime}`,
     );
-    const clockOut = dayjs(`${PDM.formatDate(now)} ${PDM.ceilTime(now)}`);
+    const clockOut = dayjs(
+      `${PDM.formatDate(now)}T${editorContents.clockOutEditedTime}`,
+    );
+    console.log(`${PDM.formatDate(now)} ${editorContents.clockInEditedTime}`);
     return clockOut.diff(clockIn, "minutes"); //未来の時間 - 過去の時間
   };
 
@@ -54,10 +61,9 @@ const ScheduleEditor = ({ dateForScheduleEditor, toggleScheduleEditor }) => {
           ),
         ),
       }),
-
       editDate: `${PDM.formatDate(dayjs())}T${PDM.formatTime(dayjs())}`,
       valid: true,
-      // workMinutes: calculateTheDayWorkMinutes(),
+      workMinutes: calculateTheDayWorkMinutes(),
       // restMinutes: PDM.calculateRestMinutes(calculateTheDayWorkMinutes()),
     };
 
@@ -69,10 +75,6 @@ const ScheduleEditor = ({ dateForScheduleEditor, toggleScheduleEditor }) => {
     setDisplayingDate(dayjs(dateForScheduleEditor));
     console.log("updated!");
   };
-
-  useEffect(() => {
-    console.log(editorContents);
-  }, [editorContents]);
 
   return (
     <>
@@ -106,12 +108,16 @@ const ScheduleEditor = ({ dateForScheduleEditor, toggleScheduleEditor }) => {
                   htmlFor="clockInTime"
                   className="mb-1 block text-sm font-medium text-gray-700"
                 >
-                  clockInTime
+                  clockInTime（5分単位に切り下げます）
                 </label>
                 <input
                   type="time"
                   id="clockInTime"
                   onChange={handleInputChange}
+                  defaultValue={
+                    allAttendanceData[PDM.formatDate(dateForScheduleEditor)]
+                      .clockInEditedTime
+                  }
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
                 />
               </div>
@@ -120,24 +126,28 @@ const ScheduleEditor = ({ dateForScheduleEditor, toggleScheduleEditor }) => {
                   htmlFor="clockOutTime"
                   className="mb-1 block text-sm font-medium text-gray-700"
                 >
-                  clockOutTime
+                  clockOutTime（5分単位に切り上げます）
                 </label>
                 <input
                   type="time"
                   id="clockOutTime"
+                  defaultValue={
+                    allAttendanceData[PDM.formatDate(dateForScheduleEditor)]
+                      .clockOutEditedTime
+                  }
                   onChange={handleInputChange}
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-400 focus:ring focus:ring-primary-200 focus:ring-opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
                 />
               </div>
               <div className="px-6">
                 <label
-                  htmlFor="dayType"
+                  htmlFor="workStatus"
                   className="mb-1 block text-sm font-medium text-gray-700"
                 >
-                  dayType
+                  workStatus
                 </label>
                 <select
-                  id="dayType"
+                  id="workStatus"
                   onChange={handleInputChange}
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50"
                 >
@@ -157,7 +167,10 @@ const ScheduleEditor = ({ dateForScheduleEditor, toggleScheduleEditor }) => {
                 <button
                   type="button"
                   className="rounded-lg border border-primary-500 bg-primary-500 px-4 py-2 text-center text-sm font-medium text-white shadow-sm transition-all hover:border-primary-700 hover:bg-primary-700 focus:ring focus:ring-primary-200 disabled:cursor-not-allowed disabled:border-primary-300 disabled:bg-primary-300"
-                  onClick={updateAttendanceData}
+                  onClick={() => {
+                    updateAttendanceData();
+                    toggleScheduleEditor();
+                  }}
                 >
                   Confirm
                 </button>
